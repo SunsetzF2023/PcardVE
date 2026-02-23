@@ -1,0 +1,58 @@
+========================================
+PYTHON INSTALLATION GUIDE
+========================================
+
+The Chinese batch files had encoding issues.
+Use these English versions instead!
+
+QUICK START:
+1. Double-click "Python Fix.bat" - This will help install Python
+2. Double-click "Start Game.bat" - This will start the game
+
+INSTALLATION OPTIONS:
+
+OPTION 1 - MICROSOFT STORE (EASIEST):
+- Open Microsoft Store
+- Search for "Python 3.10"
+- Click "Get" or "Install" (Free)
+- No configuration needed
+
+OPTION 2 - OFFICIAL WEBSITE:
+- Visit https://www.python.org/downloads/
+- Download Python 3.10.11 (more stable than 3.11)
+- Right-click installer -> "Run as administrator"
+- IMPORTANT: CHECK "Add Python to PATH"
+- Click "Install Now"
+
+OPTION 3 - ONLINE VERSION (NO INSTALLATION):
+- Visit https://replit.com/
+- Create account
+- Create new Python project
+- Copy game files and run online
+
+TROUBLESHOOTING:
+
+If you see "python is not recognized":
+- Python is not installed OR not in PATH
+- Run "Python Fix.bat" for help
+
+If installation fails:
+- Try Python 3.10.11 instead of 3.11
+- Run installer as administrator
+- Temporarily disable antivirus
+
+GAME FEATURES:
+- 30+ unique cards (Plants + Zombies)
+- 10 special abilities (Piercing, Frenzy, Lethal, Instant Kill, etc.)
+- Deck builder system (40 cards, 0-4 of each type)
+- Card collection with rarity system
+- Strategic turn-based combat
+
+AFTER INSTALLATION:
+- Double-click "Start Game.bat" to play
+- Build your 40-card deck
+- Battle against AI opponents
+- Enjoy the full PvZ Heroes experience!
+
+Need help? The game files include detailed documentation in Chinese.
+========================================

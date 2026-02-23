@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>植物大战僵尸英雄 - 卡牌对战</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <div id="app">
+        <!-- 主菜单 -->
+        <div id="mainMenu" class="screen active">
+            <div class="menu-container">
+                <h1 class="game-title">
+                    <i class="fas fa-leaf"></i> 植物大战僵尸英雄 <i class="fas fa-skull"></i>
+                </h1>
+                <p class="game-subtitle">卡牌对战游戏</p>
+                
+                <div class="menu-buttons">
+                    <button class="menu-btn" onclick="showScreen('deckBuilder')">
+                        <i class="fas fa-th"></i> 卡组构建
+                    </button>
+                    <button class="menu-btn" onclick="showScreen('cardCollection')">
+                        <i class="fas fa-book"></i> 卡牌图鉴
+                    </button>
+                    <button class="menu-btn" onclick="showScreen('game')">
+                        <i class="fas fa-play"></i> 开始游戏
+                    </button>
+                    <button class="menu-btn" onclick="showHelp()">
+                        <i class="fas fa-question-circle"></i> 游戏帮助
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡组构建 -->
+        <div id="deckBuilder" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('mainMenu')">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <h2>卡组构建</h2>
+                <div class="deck-info">
+                    <span id="deckCount">0/40</span>
+                </div>
+            </div>
+            
+            <div class="deck-builder-content">
+                <div class="card-filter">
+                    <input type="text" id="cardSearch" placeholder="搜索卡牌..." onkeyup="filterCards()">
+                    <select id="teamFilter" onchange="filterCards()">
+                        <option value="">所有队伍</option>
+                        <option value="plant">植物队</option>
+                        <option value="zombie">僵尸队</option>
+                    </select>
+                    <select id="costFilter" onchange="filterCards()">
+                        <option value="">所有费用</option>
+                        <option value="1">1费</option>
+                        <option value="2">2费</option>
+                        <option value="3">3费</option>
+                        <option value="4">4费</option>
+                        <option value="5">5费</option>
+                        <option value="6">6费+</option>
+                    </select>
+                </div>
+                
+                <div class="cards-container">
+                    <div id="availableCards" class="card-list">
+                        <!-- 可用卡牌将在这里显示 -->
+                    </div>
+                </div>
+                
+                <div class="current-deck">
+                    <h3>当前卡组</h3>
+                    <div id="currentDeck" class="deck-cards">
+                        <!-- 当前卡组将在这里显示 -->
+                    </div>
+                    <div class="deck-actions">
+                        <button class="btn btn-secondary" onclick="clearDeck()">清空卡组</button>
+                        <button class="btn btn-primary" onclick="saveDeck()">保存卡组</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡牌图鉴 -->
+        <div id="cardCollection" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('mainMenu')">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <h2>卡牌图鉴</h2>
+            </div>
+            
+            <div class="collection-content">
+                <div class="collection-tabs">
+                    <button class="tab-btn active" onclick="showCollectionTab('all')">全部卡牌</button>
+                    <button class="tab-btn" onclick="showCollectionTab('plant')">植物卡牌</button>
+                    <button class="tab-btn" onclick="showCollectionTab('zombie')">僵尸卡牌</button>
+                </div>
+                
+                <div class="collection-filter">
+                    <input type="text" placeholder="搜索卡牌..." onkeyup="filterCollection()">
+                </div>
+                
+                <div id="collectionCards" class="card-grid">
+                    <!-- 卡牌图鉴将在这里显示 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="game" class="screen">
+            <div class="game-board">
+                <!-- 对手区域 -->
+                <div class="opponent-area">
+                    <div class="player-info">
+                        <span id="opponentHealth">20</span> HP
+                        <span id="opponentMana">1/1</span>
+                    </div>
+                    <div id="opponentField" class="battlefield">
+                        <!-- 对手战场 -->
+                    </div>
+                    <div id="opponentHand" class="hand-area">
+                        <!-- 对手手牌 -->
+                    </div>
+                </div>
+
+                <!-- 战斗区域 -->
+                <div class="battle-info">
+                    <div id="turnInfo">回合 1 - 植物队</div>
+                    <div id="battleLog"></div>
+                </div>
+
+                <!-- 玩家区域 -->
+                <div class="player-area">
+                    <div id="playerHand" class="hand-area">
+                        <!-- 玩家手牌 -->
+                    </div>
+                    <div id="playerField" class="battlefield">
+                        <!-- 玩家战场 -->
+                    </div>
+                    <div class="player-info">
+                        <span id="playerHealth">20</span> HP
+                        <span id="playerMana">1/1</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="game-btn" onclick="endTurn()">结束回合</button>
+                <button class="game-btn" onclick="showScreen('mainMenu')">退出游戏</button>
+            </div>
+        </div>
+
+        <!-- 帮助界面 -->
+        <div id="helpScreen" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>游戏帮助</h2>
+                    <button class="close-btn" onclick="closeHelp()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <h3>游戏规则</h3>
+                    <p>• 每位玩家有20点生命值</p>
+                    <p>• 战场上有5个位置，可以放置卡牌</p>
+                    <p>• 每回合获得1点法力值（最多10点）</p>
+                    <p>• 根据法力值可以打出多张卡牌</p>
+                    
+                    <h3>特殊能力</h3>
+                    <p>• <strong>必中</strong>：无视防御，直接对生命值造成伤害</p>
+                    <p>• <strong>疯狂</strong>：击杀卡牌后可以再次攻击</p>
+                    <p>• <strong>致命</strong>：对无防御卡牌一击必杀</p>
+                    <p>• <strong>秒杀</strong>：无视一切防御，一击必杀</p>
+                    <p>• <strong>冻结</strong>：使目标无法攻击1回合</p>
+                    <p>• <strong>抽卡</strong>：打出时抽取一张牌</p>
+                    <p>• <strong>弹回</strong>：将击败的卡牌弹回对方手牌</p>
+                    <p>• <strong>移动</strong>：可以移动到其他空位置</p>
+                    
+                    <h3>操作方法</h3>
+                    <p>• 点击卡牌查看详情</p>
+                    <p>• 拖拽卡牌到战场放置</p>
+                    <p>• 点击卡牌进行攻击</p>
+                    <p>• 点击"结束回合"完成操作</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="cards.js"></script>
+    <script src="game.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // 注册Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('SW registered'))
+                .catch(error => console.log('SW registration failed'));
+        }
+    </script>
+</body>
+</html>
