@@ -59,6 +59,11 @@ class Player:
         self.hand.append(card)
         return card
     
+    def set_custom_deck(self, custom_deck: List[Card]):
+        """设置自定义卡组"""
+        self.deck = custom_deck.copy()
+        random.shuffle(self.deck)
+    
     def draw_initial_hand(self):
         """抽取初始手牌"""
         for _ in range(3):

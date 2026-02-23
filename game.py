@@ -19,12 +19,27 @@ class Game:
         self.turn_count = 1
         self.game_over = False
         self.winner: Optional[Team] = None
+        self.custom_plant_deck: Optional[List[Card]] = None
+        self.custom_zombie_deck: Optional[List[Card]] = None
+    
+    def set_custom_deck(self, team: Team, deck: List[Card]):
+        """设置自定义卡组"""
+        if team == Team.PLANT:
+            self.custom_plant_deck = deck
+        else:
+            self.custom_zombie_deck = deck
     
     def start_game(self):
         """开始游戏"""
         # 创建玩家
         self.plant_player = Player("植物玩家", Team.PLANT)
         self.zombie_player = Player("僵尸玩家", Team.ZOMBIE)
+        
+        # 设置自定义卡组
+        if self.custom_plant_deck:
+            self.plant_player.set_custom_deck(self.custom_plant_deck)
+        if self.custom_zombie_deck:
+            self.zombie_player.set_custom_deck(self.custom_zombie_deck)
         
         # 抽取初始手牌
         self.plant_player.draw_initial_hand()
