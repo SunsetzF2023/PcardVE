@@ -77,9 +77,10 @@ class Game:
             print(f"\n{player.name}的行动阶段")
             print("1. 查看手牌")
             print("2. 打出卡牌")
-            print("3. 结束回合")
+            print("3. 移动卡牌 (仅限有移动能力的卡牌)")
+            print("4. 结束回合")
             
-            choice = input("请选择操作 (1-3): ").strip()
+            choice = input("请选择操作 (1-4): ").strip()
             
             if choice == "1":
                 print(player.get_hand_display())
@@ -88,6 +89,9 @@ class Game:
                 self.play_card_action(player)
             
             elif choice == "3":
+                self.move_card_action(player)
+            
+            elif choice == "4":
                 print(f"{player.name}结束回合")
                 break
             
@@ -135,9 +139,27 @@ class Game:
         print("战斗阶段结束!")
         time.sleep(1)
     
+    def move_card_action(self, player: Player):
+        """移动卡牌操作"""
+        print(player.get_field_display())
+        
+        try:
+            from_pos = int(input("选择要移动的卡牌位置 (1-5): ")) - 1
+            to_pos = int(input("选择目标位置 (1-5): ")) - 1
+            
+            if player.move_card(from_pos, to_pos):
+                card = player.field[to_pos]
+                print(f"成功将 {card.name} 从位置 {from_pos + 1} 移动到位置 {to_pos + 1}!")
+                time.sleep(1)
+            else:
+                print("无法移动该卡牌，请检查位置或卡牌是否有移动能力!")
+        
+        except ValueError:
+            print("输入无效，请输入数字")
+    
     def team_attack(self, attacker: Player, defender: Player):
         """队伍攻击"""
-        attacker_cards = attacker.get_alive_cards()
+        attacker_cards = [card for card in attacker.get_alive_cards() if card.can_attack()]
         
         if not attacker_cards:
             print(f"{attacker.team.value}没有可攻击的卡牌")
@@ -150,12 +172,22 @@ class Game:
             target = self.find_target(card, defender)
             
             if target:
-                self.perform_attack(card, target)
+                killed = self.perform_attack(card, target)
+                
+                # 疯狂能力：如果击杀了目标，可以再次攻击
+                if killed and card.ability == Ability.FRENZY:
+                    print(f"{card.name} 发动疯狂效果，可以再次攻击!")
+                    new_target = self.find_target(card, defender)
+                    if new_target:
+                        self.perform_attack(card, new_target)
             else:
                 # 没有目标，直接攻击玩家
                 damage = card.attack
                 defender.take_damage(damage)
                 print(f"{card.name} 直接攻击 {defender.name}，造成 {damage} 点伤害!")
+            
+            # 标记已攻击
+            card.has_attacked_this_turn = True
     
     def find_target(self, attacker: Card, defender: Player) -> Optional[Card]:
         """寻找攻击目标"""
@@ -171,46 +203,69 @@ class Game:
         
         return None
     
-    def perform_attack(self, attacker: Card, defender: Card):
-        """执行攻击"""
+    def perform_attack(self, attacker: Card, defender: Card) -> bool:
+        """执行攻击，返回是否击杀目标"""
         damage = attacker.attack
         
         # 处理特殊能力
         attack_count = 1
+        ignore_shield = False
+        instant_kill = False
         
         if attacker.ability == Ability.DOUBLE_HIT:
             attack_count = 2
             print(f"{attacker.name} 发动双击!")
         
-        elif attacker.ability == Ability.FRENZY:
-            attack_count = random.randint(2, 3)
-            print(f"{attacker.name} 发动疯狂，攻击 {attack_count} 次!")
-        
         # 执行多次攻击
         for i in range(attack_count):
             current_damage = damage
             
-            # 必中能力
+            # 必中能力：无视防御
             if attacker.ability == Ability.PIERCING:
-                print(f"{attacker.name} 的攻击必中!")
+                ignore_shield = True
+                print(f"{attacker.name} 的攻击必中，无视防御!")
             
-            # 致命能力
-            if attacker.ability == Ability.LETHAL and random.random() < 0.3:  # 30%几率
+            # 致命能力：对无防御卡牌一击必杀
+            if attacker.ability == Ability.LETHAL and defender.ability != Ability.SHIELD:
                 current_damage = defender.current_health
                 print(f"{attacker.name} 发动致命一击!")
+            
+            # 秒杀能力：无视一切防御
+            elif attacker.ability == Ability.INSTANT_KILL:
+                current_damage = defender.current_health
+                ignore_shield = True
+                print(f"{attacker.name} 发动秒杀效果!")
             
             print(f"{attacker.name} 攻击 {defender.name}，造成 {current_damage} 点伤害!")
             
             # 造成伤害
-            is_dead = defender.take_damage(current_damage)
+            is_dead = defender.take_damage(current_damage, ignore_shield)
             
             if is_dead:
                 print(f"{defender.name} 被击败了!")
-                break
+                
+                # 弹回手牌效果
+                if attacker.ability == Ability.BOUNCE:
+                    defender_player = self.zombie_player if defender.team == Team.ZOMBIE else self.plant_player
+                    for i, card in enumerate(defender_player.field):
+                        if card == defender:
+                            defender_player.bounce_card_to_hand(i)
+                            print(f"{defender.name} 被弹回手牌!")
+                            break
+                
+                time.sleep(0.5)
+                return True
             else:
                 print(f"{defender.name} 剩余生命: {defender.current_health}")
             
+            # 冻结效果
+            if attacker.ability == Ability.FREEZE:
+                defender.freeze()
+                print(f"{defender.name} 被冻结了!")
+            
             time.sleep(0.5)
+        
+        return False
     
     def end_turn_phase(self):
         """回合结束阶段"""

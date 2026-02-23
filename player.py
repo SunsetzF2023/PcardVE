@@ -86,13 +86,27 @@ class Player:
         self.mana -= card.cost
         self.hand.pop(card_index)
         
+        # 处理打出时的特殊能力
+        self._on_card_played(card)
+        
         return True
+    
+    def _on_card_played(self, card):
+        """处理打出卡牌时的特殊能力"""
+        if card.ability == Ability.DRAW_CARD:
+            self.draw_card()
+            print(f"{card.name} 发动抽卡效果，抽取一张牌!")
     
     def start_turn(self):
         """开始回合"""
         self.max_mana = min(10, self.max_mana + 1)
         self.mana = self.max_mana
         self.draw_card()
+        
+        # 重置所有卡牌的回合状态
+        for card in self.field:
+            if card:
+                card.reset_turn_state()
     
     def take_damage(self, damage: int):
         """玩家受到伤害"""
@@ -103,6 +117,50 @@ class Player:
     def is_alive(self) -> bool:
         """玩家是否存活"""
         return self.health > 0
+    
+    def move_card(self, from_position: int, to_position: int) -> bool:
+        """移动卡牌位置"""
+        if from_position < 0 or from_position >= 5 or to_position < 0 or to_position >= 5:
+            return False
+        
+        if from_position == to_position:
+            return False
+        
+        from_card = self.field[from_position]
+        to_card = self.field[to_position]
+        
+        if not from_card:
+            return False
+        
+        if to_card is not None:
+            return False
+        
+        # 检查卡牌是否有移动能力
+        if from_card.ability != Ability.MOVE:
+            return False
+        
+        # 执行移动
+        self.field[to_position] = from_card
+        self.field[from_position] = None
+        from_card.position = to_position
+        
+        return True
+    
+    def bounce_card_to_hand(self, position: int) -> bool:
+        """将场上的卡牌弹回手牌"""
+        if position < 0 or position >= 5:
+            return False
+        
+        card = self.field[position]
+        if not card:
+            return False
+        
+        # 移回手牌
+        card.reset_health()
+        self.hand.append(card)
+        self.field[position] = None
+        
+        return True
     
     def get_alive_cards(self) -> List[Card]:
         """获取场上存活的卡牌"""
