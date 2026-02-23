@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>植物大战僵尸：英雄</title>
+    <link rel="stylesheet" href="pvz-heroes.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- 顶部信息栏 -->
+        <div id="topBar">
+            <div id="zombieHero">
+                <div class="heroInfo">
+                    <div class="heroName">超级脑袋</div>
+                    <div class="heroHealth">
+                        <i class="fas fa-heart"></i>
+                        <span id="zombieHeroHealth">20</span>
+                    </div>
+                    <div class="heroResources">
+                        <i class="fas fa-brain"></i>
+                        <span id="zombieHeroResources">1</span>
+                    </div>
+                    <div class="blockMeter">
+                        <div class="blockBar">
+                            <div id="zombieBlockMeter" class="blockFill"></div>
+                        </div>
+                        <span class="blockText">格挡: <span id="zombieBlockText">0</span>/8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="phaseIndicator">
+                <div class="currentPhase">
+                    <span id="currentPhaseText">僵尸出牌阶段</span>
+                </div>
+                <div class="turnCount">
+                    回合 <span id="turnCount">1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏主区域 -->
+        <div id="gameBoard">
+            <!-- 战道区域 -->
+            <div id="lanes">
+                <!-- 战道1 - 高地 -->
+                <div class="lane" data-lane="1" data-type="HEIGHTS">
+                    <div class="laneLabel">高地</div>
+                    <div class="laneArea">
+                        <div class="zombieSlot"></div>
+                        <div class="plantSlot"></div>
+                    </div>
+                </div>
+                
+                <!-- 战道2 - 陆地 -->
+                <div class="lane" data-lane="2" data-type="LAND">
+                    <div class="laneLabel">陆地</div>
+                    <div class="laneArea">
+                        <div class="zombieSlot"></div>
+                        <div class="plantSlot"></div>
+                    </div>
+                </div>
+                
+                <!-- 战道3 - 陆地 -->
+                <div class="lane" data-lane="3" data-type="LAND">
+                    <div class="laneLabel">陆地</div>
+                    <div class="laneArea">
+                        <div class="zombieSlot"></div>
+                        <div class="plantSlot"></div>
+                    </div>
+                </div>
+                
+                <!-- 战道4 - 陆地 -->
+                <div class="lane" data-lane="4" data-type="LAND">
+                    <div class="laneLabel">陆地</div>
+                    <div class="laneArea">
+                        <div class="zombieSlot"></div>
+                        <div class="plantSlot"></div>
+                    </div>
+                </div>
+                
+                <!-- 战道5 - 水路 -->
+                <div class="lane" data-lane="5" data-type="WATER">
+                    <div class="laneLabel">水路</div>
+                    <div class="laneArea">
+                        <div class="zombieSlot"></div>
+                        <div class="plantSlot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部信息栏 -->
+        <div id="bottomBar">
+            <div id="plantHero">
+                <div class="heroInfo">
+                    <div class="heroName">绿影</div>
+                    <div class="heroHealth">
+                        <i class="fas fa-heart"></i>
+                        <span id="plantHeroHealth">20</span>
+                    </div>
+                    <div class="heroResources">
+                        <i class="fas fa-sun"></i>
+                        <span id="plantHeroResources">1</span>
+                    </div>
+                    <div class="blockMeter">
+                        <div class="blockBar">
+                            <div id="plantBlockMeter" class="blockFill"></div>
+                        </div>
+                        <span class="blockText">格挡: <span id="plantBlockText">0</span>/8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="actionArea">
+                <button id="endPhaseBtn" class="actionBtn">
+                    <i class="fas fa-forward"></i>
+                    结束阶段
+                </button>
+                <button id="superPowerBtn" class="actionBtn superPower">
+                    <i class="fas fa-star"></i>
+                    超级技能
+                </button>
+            </div>
+        </div>
+
+        <!-- 手牌区域 -->
+        <div id="handArea">
+            <div id="handCards" class="handContainer">
+                <!-- 手牌将在这里动态生成 -->
+            </div>
+        </div>
+
+        <!-- 战斗日志 -->
+        <div id="battleLog">
+            <div class="logHeader">战斗日志</div>
+            <div id="logContent" class="logContent">
+                <!-- 日志内容将在这里显示 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 卡牌详情弹窗 -->
+    <div id="cardDetailModal" class="modal">
+        <div class="modalContent">
+            <div class="modalHeader">
+                <h3 id="cardDetailName">卡牌名称</h3>
+                <button class="closeBtn" onclick="closeCardDetail()">&times;</button>
+            </div>
+            <div class="modalBody">
+                <div class="cardDetailInfo">
+                    <div class="cardDetailCost">
+                        <i class="fas fa-coins"></i>
+                        <span id="cardDetailCost">0</span>
+                    </div>
+                    <div class="cardDetailStats">
+                        <div class="stat">
+                            <i class="fas fa-sword"></i>
+                            <span id="cardDetailAttack">0</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-heart"></i>
+                            <span id="cardDetailHealth">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cardDetailDescription" id="cardDetailDescription">
+                    卡牌描述
+                </div>
+                <div class="cardDetailAbilities" id="cardDetailAbilities">
+                    <!-- 能力标签将在这里显示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div id="gameOverModal" class="modal">
+        <div class="modalContent">
+            <div class="modalHeader">
+                <h2>游戏结束</h2>
+            </div>
+            <div class="modalBody">
+                <div class="winnerText" id="winnerText">
+                    <!-- 获胜者信息 -->
+                </div>
+                <div class="gameStats">
+                    <div class="stat">
+                        <span>总回合数:</span>
+                        <span id="totalTurns">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>游戏时长:</span>
+                        <span id="gameDuration">00:00</span>
+                    </div>
+                </div>
+                <div class="modalActions">
+                    <button class="btn btn-primary" onclick="restartGame()">再来一局</button>
+                    <button class="btn btn-secondary" onclick="backToMenu()">返回菜单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载脚本 -->
+    <script src="core.js"></script>
+    <script src="cards-data.js"></script>
+    <script src="pvz-heroes-game.js"></script>
+</body>
+</html>

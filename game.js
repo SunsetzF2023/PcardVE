@@ -205,6 +205,15 @@ class GameState {
             const card = this.currentPlayer.field[i];
             if (card && card.isAlive()) {
                 slot.appendChild(createCardElement(card));
+                
+                // 如果有组队联手，显示特殊标记
+                if (card.ability === 'teamwork') {
+                    const teamworkIcon = document.createElement('div');
+                    teamworkIcon.className = 'teamwork-icon';
+                    teamworkIcon.innerHTML = '🤝';
+                    teamworkIcon.title = '组队联手：可放置第二个植物';
+                    slot.appendChild(teamworkIcon);
+                }
             }
             
             playerField.appendChild(slot);
@@ -219,6 +228,15 @@ class GameState {
             const card = this.opponent.field[i];
             if (card && card.isAlive()) {
                 slot.appendChild(createCardElement(card));
+                
+                // 如果有组队联手，显示特殊标记
+                if (card.ability === 'teamwork') {
+                    const teamworkIcon = document.createElement('div');
+                    teamworkIcon.className = 'teamwork-icon';
+                    teamworkIcon.innerHTML = '🤝';
+                    teamworkIcon.title = '组队联手：可放置第二个植物';
+                    slot.appendChild(teamworkIcon);
+                }
             }
             
             opponentField.appendChild(slot);
@@ -254,10 +272,25 @@ class GameState {
         if (this.currentPlayer.mana < card.cost) return;
         
         const slots = document.querySelectorAll('#playerField .battlefield-slot');
-        slots.forEach(slot => {
-            if (!slot.firstChild) {
+        slots.forEach((slot, index) => {
+            const existingCard = this.currentPlayer.field[index];
+            
+            // 检查是否可以放置
+            let canPlace = !existingCard;
+            
+            // 如果有组队联手卡牌，可以放置第二个
+            if (existingCard && existingCard.ability === 'teamwork') {
+                canPlace = true;
+            }
+            
+            // 如果新卡牌有组队联手，也可以放置在有卡牌的位置
+            if (existingCard && card.ability === 'teamwork') {
+                canPlace = true;
+            }
+            
+            if (canPlace) {
                 slot.classList.add('valid-position');
-                slot.addEventListener('click', () => this.playCard(card, slot.dataset.position));
+                slot.addEventListener('click', () => this.playCard(card, index));
             }
         });
     }
@@ -268,16 +301,39 @@ class GameState {
             return;
         }
         
-        const success = this.currentPlayer.playCard(this.selectedCard.index, parseInt(position));
-        if (success) {
-            this.addBattleLog(`打出了 ${card.name}`);
-            this.updateUI();
-            
-            // 处理抽卡效果
-            if (card.ability === 'drawcard') {
-                this.currentPlayer.drawCard();
-                this.addBattleLog(`${card.name} 发动抽卡效果`);
-            }
+        const existingCard = this.currentPlayer.field[position];
+        
+        // 检查是否可以放置
+        let canPlace = !existingCard;
+        
+        // 如果有组队联手卡牌，可以放置第二个
+        if (existingCard && existingCard.ability === 'teamwork') {
+            canPlace = true;
+        }
+        
+        // 如果新卡牌有组队联手，也可以放置在有卡牌的位置
+        if (existingCard && card.ability === 'teamwork') {
+            canPlace = true;
+        }
+        
+        if (!canPlace) {
+            this.addBattleLog('该位置已有卡牌！');
+            return;
+        }
+        
+        // 打出卡牌
+        this.currentPlayer.field[position] = card;
+        card.position = position;
+        this.currentPlayer.mana -= card.cost;
+        this.currentPlayer.hand.splice(this.selectedCard.index, 1);
+        
+        this.addBattleLog(`打出了 ${card.name}`);
+        this.updateUI();
+        
+        // 处理抽卡效果
+        if (card.ability === 'drawcard' || (card.id === 'sunshroom')) {
+            this.currentPlayer.drawCard();
+            this.addBattleLog(`${card.name} 发动抽卡效果`);
         }
         
         // 清除选择状态

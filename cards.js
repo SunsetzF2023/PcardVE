@@ -31,8 +31,8 @@ const CARDS = {
             attack: 0,
             health: 6,
             team: 'plant',
-            ability: 'shield',
-            description: '高防御植物',
+            ability: 'teamwork',
+            description: '高防御植物，可组队联手',
             rarity: 'common'
         },
         {
@@ -75,8 +75,8 @@ const CARDS = {
             attack: 1,
             health: 8,
             team: 'plant',
-            ability: 'shield',
-            description: '超高防御',
+            ability: 'teamwork',
+            description: '超高防御，可组队联手',
             rarity: 'common'
         },
         {
@@ -105,11 +105,11 @@ const CARDS = {
             id: 'potatomine',
             name: '土豆地雷',
             cost: 1,
-            attack: 0,
+            attack: 2,
             health: 1,
             team: 'plant',
-            ability: 'instantkill',
-            description: '埋伏陷阱，一击必杀',
+            ability: 'teamwork',
+            description: '对敌方僵尸造成2点伤害，可组队联手',
             rarity: 'legendary'
         },
         {
@@ -130,8 +130,8 @@ const CARDS = {
             attack: 0,
             health: 2,
             team: 'plant',
-            ability: 'drawcard',
-            description: '打出时抽一张牌',
+            ability: 'teamwork',
+            description: '打出时抽一张牌，可组队联手',
             rarity: 'common'
         },
         {
@@ -352,7 +352,8 @@ const ABILITIES = {
     drawcard: { name: '抽卡', description: '打出时抽取一张牌' },
     bounce: { name: '弹回', description: '将击败的卡牌弹回对方手牌' },
     move: { name: '移动', description: '可以移动到其他空位置' },
-    heal: { name: '治疗', description: '每回合治疗相邻卡牌1点' }
+    heal: { name: '治疗', description: '每回合治疗相邻卡牌1点' },
+    teamwork: { name: '组队联手', description: '所在位置可放置第二个植物' }
 };
 
 // 稀有度定义
