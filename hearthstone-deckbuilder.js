@@ -84,8 +84,43 @@ class HearthstoneDeckBuilder {
             e.preventDefault();
             deckDropZone.classList.remove('drag-over');
             
-            const cardData = JSON.parse(e.dataTransfer.getData('text/plain'));
-            this.addCardToDeck(cardData);
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            
+            // 如果是从卡组拖出，则移除卡牌
+            if (data.isFromDeck) {
+                this.removeCardFromDeck(data.index);
+            } else {
+                // 如果是从收藏拖入，则添加卡牌
+                this.addCardToDeck(data);
+            }
+        });
+        
+        // 设置整个文档的拖拽区域，支持拖拽到空白处移除卡牌
+        document.addEventListener('dragover', (e) => {
+            const data = e.dataTransfer.getData('text/plain');
+            if (data) {
+                const parsedData = JSON.parse(data);
+                if (parsedData.isFromDeck) {
+                    e.preventDefault();
+                    document.body.classList.add('drag-outside');
+                }
+            }
+        });
+        
+        document.addEventListener('dragleave', () => {
+            document.body.classList.remove('drag-outside');
+        });
+        
+        document.addEventListener('drop', (e) => {
+            document.body.classList.remove('drag-outside');
+            const data = e.dataTransfer.getData('text/plain');
+            if (data) {
+                const parsedData = JSON.parse(data);
+                if (parsedData.isFromDeck && e.target.closest('#deckDropZone') === null) {
+                    // 拖拽到卡组外部，移除卡牌
+                    this.removeCardFromDeck(parsedData.index);
+                }
+            }
         });
     }
 
@@ -329,6 +364,7 @@ class HearthstoneDeckBuilder {
     createDeckCard(card, index) {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'deck-card';
+        cardDiv.draggable = true;
         
         const count = this.getCardCountInDeck(card.id);
         
@@ -338,10 +374,31 @@ class HearthstoneDeckBuilder {
                 <span class="card-cost">${card.cost}</span>
             </div>
             <span class="card-count">${count}</span>
-            <button class="remove-btn" onclick="deckBuilder.removeCardFromDeck(${index})">
+            <button class="remove-btn" data-index="${index}">
                 <i class="fas fa-times"></i>
             </button>
         `;
+        
+        // 添加移除按钮事件监听器
+        const removeBtn = cardDiv.querySelector('.remove-btn');
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.removeCardFromDeck(index);
+        });
+        
+        // 添加拖拽事件 - 从卡组拖出
+        cardDiv.addEventListener('dragstart', (e) => {
+            cardDiv.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                card: card,
+                index: index,
+                isFromDeck: true
+            }));
+        });
+        
+        cardDiv.addEventListener('dragend', () => {
+            cardDiv.classList.remove('dragging');
+        });
         
         return cardDiv;
     }
@@ -454,8 +511,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // 尝试加载保存的卡组
     deckBuilder.loadDeck();
 });
-
-// 全局函数
-window.removeCardFromDeck = (index) => {
-    deckBuilder.removeCardFromDeck(index);
-};

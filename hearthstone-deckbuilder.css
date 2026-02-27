@@ -647,6 +647,27 @@ body {
     transform: rotate(5deg);
 }
 
+.drag-outside {
+    background: rgba(244, 67, 54, 0.1) !important;
+    cursor: not-allowed;
+}
+
+.drag-outside::before {
+    content: '拖拽到这里移除卡牌';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(244, 67, 54, 0.9);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    z-index: 1001;
+    pointer-events: none;
+}
+
 /* 响应式设计 */
 @media (max-width: 1024px) {
     .main-content {
