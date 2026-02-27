@@ -184,6 +184,33 @@ body {
     margin-bottom: 15px;
 }
 
+.deck-info {
+    margin-bottom: 15px;
+}
+
+.deck-team {
+    background: #21262d;
+    border: 1px solid #30363d;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    color: #58a6ff;
+}
+
+.deck-team.plant {
+    background: linear-gradient(135deg, #0d4219, #161b22);
+    border-color: #238636;
+    color: #238636;
+}
+
+.deck-team.zombie {
+    background: linear-gradient(135deg, #490202, #161b22);
+    border-color: #da3633;
+    color: #da3633;
+}
+
 .deck-summary {
     display: flex;
     gap: 20px;

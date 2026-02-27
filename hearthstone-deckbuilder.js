@@ -286,6 +286,21 @@ class HearthstoneDeckBuilder {
             addBtn.disabled = true;
             addBtn.textContent = '卡组已满';
             addBtn.classList.add('disabled');
+        } else if (this.currentDeck.length > 0) {
+            const firstCardTeam = this.currentDeck[0].team;
+            if (card.team !== firstCardTeam) {
+                const teamNames = {
+                    'plant': '植物',
+                    'zombie': '僵尸'
+                };
+                addBtn.disabled = true;
+                addBtn.textContent = `阵营不符(${teamNames[firstCardTeam]}卡组)`;
+                addBtn.classList.add('disabled');
+            } else {
+                addBtn.disabled = false;
+                addBtn.innerHTML = '<i class="fas fa-plus"></i> 添加到卡组';
+                addBtn.classList.remove('disabled');
+            }
         } else {
             addBtn.disabled = false;
             addBtn.innerHTML = '<i class="fas fa-plus"></i> 添加到卡组';
@@ -313,6 +328,19 @@ class HearthstoneDeckBuilder {
         if (this.currentDeck.length >= this.maxDeckSize) {
             this.showToast('卡组已满！');
             return;
+        }
+        
+        // 检查阵营限制
+        if (this.currentDeck.length > 0) {
+            const firstCardTeam = this.currentDeck[0].team;
+            if (card.team !== firstCardTeam) {
+                const teamNames = {
+                    'plant': '植物',
+                    'zombie': '僵尸'
+                };
+                this.showToast(`不能混合阵营！当前卡组是${teamNames[firstCardTeam]}阵营，不能添加${teamNames[card.team]}`);
+                return;
+            }
         }
         
         this.currentDeck.push({...card});
@@ -344,19 +372,29 @@ class HearthstoneDeckBuilder {
         const placeholder = document.querySelector('.deck-placeholder');
         const totalCards = document.getElementById('totalCards');
         const avgCost = document.getElementById('avgCost');
-        const cardCount = document.getElementById('cardCount');
+        const deckTeam = document.getElementById('deckTeam');
         
         // 更新统计
         totalCards.textContent = this.currentDeck.length;
+        const cardCount = document.getElementById('cardCount');
         cardCount.textContent = `${this.currentDeck.length}/${this.maxDeckSize}`;
         
         if (this.currentDeck.length > 0) {
-            const totalCost = this.currentDeck.reduce((sum, card) => sum + card.cost, 0);
-            avgCost.textContent = (totalCost / this.currentDeck.length).toFixed(1);
-            
             // 显示卡组内容，隐藏占位符
+            deckContent.style.display = 'block';
             deckContent.classList.add('has-cards');
             placeholder.style.display = 'none';
+            
+            // 更新阵营显示
+            if (this.currentDeck.length > 0) {
+                const team = this.currentDeck[0].team;
+                const teamNames = {
+                    'plant': '植物阵营',
+                    'zombie': '僵尸阵营'
+                };
+                deckTeam.textContent = teamNames[team];
+                deckTeam.className = `deck-team ${team}`;
+            }
             
             // 渲染卡组中的卡牌
             deckContent.innerHTML = '';
@@ -368,9 +406,14 @@ class HearthstoneDeckBuilder {
             this.updateDeckStats();
         } else {
             // 显示占位符，隐藏卡组内容
+            deckContent.style.display = 'none';
             deckContent.classList.remove('has-cards');
             placeholder.style.display = 'flex';
             avgCost.textContent = '0.0';
+            
+            // 重置阵营显示
+            deckTeam.textContent = '未选择阵营';
+            deckTeam.className = 'deck-team';
             
             // 清空统计
             document.getElementById('costCurve').innerHTML = '';
@@ -378,6 +421,7 @@ class HearthstoneDeckBuilder {
         }
     }
 
+// ...
     // 创建卡组中的卡牌元素
     createDeckCard(card, index) {
         const cardDiv = document.createElement('div');
