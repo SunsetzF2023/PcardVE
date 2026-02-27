@@ -365,6 +365,7 @@ class HearthstoneDeckBuilder {
         const cardDiv = document.createElement('div');
         cardDiv.className = 'deck-card';
         cardDiv.draggable = true;
+        cardDiv.style.position = 'relative';
         
         const count = this.getCardCountInDeck(card.id);
         
@@ -374,16 +375,19 @@ class HearthstoneDeckBuilder {
                 <span class="card-cost">${card.cost}</span>
             </div>
             <span class="card-count">${count}</span>
-            <button class="remove-btn" data-index="${index}">
+            <button class="remove-btn" data-index="${index}" title="移除卡牌">
                 <i class="fas fa-times"></i>
             </button>
         `;
         
-        // 添加移除按钮事件监听器
+        // 添加移除按钮事件监听器 - 使用事件委托
         const removeBtn = cardDiv.querySelector('.remove-btn');
         removeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            this.removeCardFromDeck(index);
+            const cardIndex = parseInt(e.currentTarget.getAttribute('data-index'));
+            console.log('点击移除按钮，索引:', cardIndex); // 调试信息
+            this.removeCardFromDeck(cardIndex);
         });
         
         // 添加拖拽事件 - 从卡组拖出

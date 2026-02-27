@@ -292,19 +292,19 @@ body {
 
 .deck-card .card-name {
     font-weight: 500;
-    color: #FF9800;
+    color: #c9d1d9;
 }
 
 .deck-card .card-cost {
-    background: rgba(255, 255, 255, 0.2);
+    background: #21262d;
     padding: 4px 8px;
     border-radius: 15px;
     font-size: 0.9rem;
-    color: #FF9800;
+    color: #f85149;
 }
 
 .deck-card .card-count {
-    background: #4CAF50;
+    background: #238636;
     color: white;
     padding: 2px 8px;
     border-radius: 10px;
@@ -314,7 +314,7 @@ body {
 }
 
 .deck-card .remove-btn {
-    background: #f44336;
+    background: #da3633;
     color: white;
     border: none;
     border-radius: 50%;
@@ -325,6 +325,10 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 10;
 }
 
 .deck-card .remove-btn:hover {
