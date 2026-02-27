@@ -55,6 +55,13 @@ class HearthstoneDeckBuilder {
             this.closeCardModal();
         });
 
+        // 模态框添加按钮
+        document.getElementById('addToDeckBtn').addEventListener('click', () => {
+            if (this.selectedCard) {
+                this.addCardToDeck(this.selectedCard);
+            }
+        });
+
         // 点击模态框外部关闭
         document.getElementById('cardModal').addEventListener('click', (e) => {
             if (e.target.id === 'cardModal') {
