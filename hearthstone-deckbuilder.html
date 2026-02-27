@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>植物大战僵尸英雄 - 炉石风格卡组构建</title>
+    <link rel="stylesheet" href="hearthstone-deckbuilder.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部工具栏 -->
+        <header class="toolbar">
+            <div class="deck-info">
+                <h2>卡组构建器</h2>
+                <div class="deck-stats">
+                    <span id="cardCount">0/40</span>
+                    <span id="deckCost">0</span>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="clearDeck" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> 清空卡组
+                </button>
+                <button id="saveDeck" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 保存卡组
+                </button>
+                <button id="backToMenu" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回菜单
+                </button>
+            </div>
+        </header>
+
+        <!-- 主要内容区 -->
+        <main class="main-content">
+            <!-- 左侧：卡牌收藏 -->
+            <section class="card-collection">
+                <div class="collection-header">
+                    <h3>卡牌收藏</h3>
+                    <div class="filter-controls">
+                        <input type="text" id="searchInput" placeholder="搜索卡牌..." class="search-input">
+                        <select id="teamFilter" class="filter-select">
+                            <option value="">所有队伍</option>
+                            <option value="plant">植物队</option>
+                            <option value="zombie">僵尸队</option>
+                        </select>
+                        <select id="costFilter" class="filter-select">
+                            <option value="">所有费用</option>
+                            <option value="1">1费</option>
+                            <option value="2">2费</option>
+                            <option value="3">3费</option>
+                            <option value="4">4费</option>
+                            <option value="5">5费</option>
+                            <option value="6">6费+</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="cardGrid" class="card-grid">
+                    <!-- 卡牌将在这里动态生成 -->
+                </div>
+            </section>
+
+            <!-- 右侧：卡组构建区 -->
+            <section class="deck-builder">
+                <div class="deck-header">
+                    <h3>我的卡组</h3>
+                    <div class="deck-summary">
+                        <div class="summary-item">
+                            <span class="label">卡牌数量:</span>
+                            <span id="totalCards" class="value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">平均费用:</span>
+                            <span id="avgCost" class="value">0.0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 卡组区域 -->
+                <div id="deckArea" class="deck-area">
+                    <div class="deck-drop-zone" id="deckDropZone">
+                        <div class="deck-placeholder">
+                            <i class="fas fa-layer-group"></i>
+                            <p>拖拽卡牌到这里构建卡组</p>
+                            <p class="hint">每种卡牌最多4张</p>
+                        </div>
+                        
+                        <!-- 卡组内容 -->
+                        <div id="deckContent" class="deck-content">
+                            <!-- 卡组中的卡牌将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 卡组统计 -->
+                <div class="deck-stats-panel">
+                    <h4>卡组统计</h4>
+                    <div id="costCurve" class="cost-curve">
+                        <!-- 费用曲线图 -->
+                    </div>
+                    <div id="cardTypeStats" class="type-stats">
+                        <!-- 卡牌类型统计 -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 卡牌详情弹窗 -->
+        <div id="cardModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalCardName">卡牌名称</h3>
+                    <button class="close-btn" onclick="closeCardModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="card-display">
+                        <div id="modalCardImage" class="card-image">
+                            <!-- 卡牌图片 -->
+                        </div>
+                        <div class="card-info">
+                            <div class="card-cost">
+                                <i class="fas fa-coins"></i>
+                                <span id="modalCardCost">0</span>
+                            </div>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <i class="fas fa-sword"></i>
+                                    <span id="modalCardAttack">0</span>
+                                </div>
+                                <div class="stat">
+                                    <i class="fas fa-heart"></i>
+                                    <span id="modalCardHealth">0</span>
+                                </div>
+                            </div>
+                            <div class="card-description" id="modalCardDescription">
+                                卡牌描述
+                            </div>
+                            <div class="card-abilities" id="modalCardAbilities">
+                                <!-- 能力标签 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="addToDeckBtn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> 添加到卡组
+                        </button>
+                        <div class="card-count">
+                            已添加: <span id="modalCardCount">0</span>/4
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提示信息 -->
+        <div id="toast" class="toast">
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <!-- 加载脚本 -->
+    <script src="cards.js"></script>
+    <script src="hearthstone-deckbuilder.js"></script>
+</body>
+</html>
