@@ -55,12 +55,23 @@ class HearthstoneDeckBuilder {
             this.closeCardModal();
         });
 
-        // 模态框添加按钮
-        document.getElementById('addToDeckBtn').addEventListener('click', () => {
-            if (this.selectedCard) {
-                this.addCardToDeck(this.selectedCard);
-            }
-        });
+        // 模态框添加按钮 - 使用更可靠的方式
+        const addBtn = document.getElementById('addToDeckBtn');
+        if (addBtn) {
+            addBtn.addEventListener('click', (e) => {
+                console.log('模态框添加按钮被点击', this.selectedCard); // 调试信息
+                e.preventDefault();
+                e.stopPropagation();
+                if (this.selectedCard) {
+                    this.addCardToDeck(this.selectedCard);
+                } else {
+                    console.log('没有选中的卡牌'); // 调试信息
+                }
+            });
+            console.log('模态框添加按钮事件绑定成功'); // 调试信息
+        } else {
+            console.log('未找到模态框添加按钮'); // 调试信息
+        }
 
         // 点击模态框外部关闭
         document.getElementById('cardModal').addEventListener('click', (e) => {
